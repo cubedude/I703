@@ -1,4 +1,4 @@
-Arvutipargi haldus
+I703 Python
 ==========================
 
 Welcome!

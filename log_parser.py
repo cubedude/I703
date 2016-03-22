@@ -1,6 +1,3 @@
-# python log_parser.py -f skip/ -v       <-- TEST
-# python log_parser.py -f logs/ -v       <-- TRUE
-
 import os
 import gzip
 import collections
@@ -8,6 +5,7 @@ import argparse
 from datetime import datetime
 
 class logParser():
+	chat = 0
 	d = collections.Counter()
 	u = collections.Counter()
 	t = collections.Counter()
@@ -27,8 +25,8 @@ class logParser():
 		else:
 			return "%.1f GB" % (bytes / 1024.0 ** 3)
 			
-	def parseLogs(self, file, zip = 0):
-		if zip: 
+	def parseLogs(self, file):
+		if file.endswith(".gz"):
 			fh = gzip.open(file)
 		else:
 			fh = open(file)
@@ -36,6 +34,7 @@ class logParser():
 		 
 		for line in fh:
 			try:
+				#157.55.39.242 - - [20/Mar/2016:06:42:47 +0200] "GET /~jpoial/docs/api/index.html?java/awt/event/ContainerAdapter.html HTTP/1.1" 200 1417 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)"
 				source, request, response, referrer, _, agent, _ = line.split("\"")
 				method, path, protocol = request.split(" ")
 				_, user, file = path.split("/",3)
@@ -48,8 +47,7 @@ class logParser():
 				if(self.last < stamped):
 					self.last = stamped
 					
-				print "referrer: ", referrer
-					
+				#print "referrer: ", referrer
 					
 				self.p[path] += 1
 				
@@ -67,15 +65,15 @@ class logParser():
 			except ValueError:
 				pass
 
-	def parseDirectory(self, dirs, chat):
+	def parseDirectory(self, dirs):
 		for filename in os.listdir(dirs):	
 			if os.path.isdir(os.path.join(dirs, filename)):
-				if chat:
+				if self.chat:
 					print "..Checking directory:", filename
-				self.parseDirectory(os.path.join(dirs, filename), chat)
+				self.parseDirectory(os.path.join(dirs, filename))
 				continue
 			if not filename.startswith("access.log"):
-				if chat:
+				if self.chat:
 					print "..Skipping unknown file:", filename
 				continue
 				
@@ -83,49 +81,41 @@ class logParser():
 			self.files.append((os.path.join(dirs, filename), datetime.fromtimestamp(mtime), size)) # Append 3-tuple to list
 			
 			if filename.endswith(".gz"):
-				if chat:
+				if self.chat:
 					print "..Checking compressed file:", filename
-				self.parseLogs(os.path.join(dirs, filename),1)
+				self.parseLogs(os.path.join(dirs, filename))
 				continue
-			if chat:
+			if self.chat:
 				print "\nGoing to process:", filename
 			
 			self.parseLogs(os.path.join(dirs, filename))
 	
 	def displaySummary(self):
-		total = sum(self.d.values())
-		print "=============================================\nTotal lines with requested keywords:", total
-		for keyword, hits in sorted(self.d.items(), key = lambda (keyword,hits):-hits):
-			print "%s => %d (%.02f%%)" % (keyword, hits, hits * 100 / total)
-			
-		print "\nTop 5 requested URLs:"
-		i = 0
-		for path, hits in sorted(self.p.items(), key = lambda (path,hits):-hits):
-			print "%s => %d (%.02f%%)" % (path, hits, hits * 100 / total)
-			i += 1
-			if i >= 5:
-				break
-				
-		print "\nTop 5 requested users and their traffic:"
-		i = 0
-		for user, hits in sorted(self.u.items(), key = lambda (user,hits):-hits):
-			print "%s => %d (%.02f%%) => %s" % (user, hits, hits * 100 / total, self.humanize(self.t[user]))
-			i += 1
-			if i >= 5:
-				break
+		print "============================================="
 		
-		print "\nTop 5 faulty URLs:"
-		i = 0
-		for path, hits in sorted(self.e.items(), key = lambda (path,hits):-hits):
-			print "%s => %d (%.02f%%)" % (path, hits, hits * 100 / total)
-			i += 1
-			if i >= 5:
-				break
+		print "Total lines with requested keywords:", sum(self.d.values())
+		for keyword, hits in self.d.most_common():
+			print "%s => %d (%.02f%%)" % (keyword, hits, hits * 100 / sum(self.d.values()))
+			
+		print "\nTop 5 requested URLs (total: %d):" % (sum(self.p.values()))
+		for path, hits in self.p.most_common(5):
+			print "%s => %d (%.02f%%)" % (path, hits, hits * 100 / sum(self.p.values()))
+		
+		print "\nTop 5 requested users and their traffic (total: %d):" % (sum(self.u.values()))
+		for user, hits in self.u.most_common(5):
+			print "%s => %d (%.02f%%) => %s" % (user, hits, hits * 100 / sum(self.u.values()), self.humanize(self.t[user]))
+		
+		print "\nTop 5 faulty URLs (total: %d):" % (sum(self.e.values()))
+		for path, hits in self.e.most_common(5):
+			print "%s => %d (%.02f%%)" % (path, hits, hits * 100 / sum(self.e.values()))
+			
 		print "=============================================\n\n"
 		
 		
 	def analyzeFiles(self): 
 		print "Analyze files"
+		print "============================================="
+		
 		self.files.sort(key = lambda(filename, dt, size):dt)
 		for filename, dt, size in self.files:
 			print filename, dt, self.humanize(size)
@@ -143,7 +133,8 @@ parser.add_argument('-v', '--verbose', help="Increase verbosity", action="store_
 args = parser.parse_args()
 
 logParser = logParser()
-logParser.parseDirectory(args.folder, args.verbose)
+if args.verbose: logParser.chat = 1;
+logParser.parseDirectory(args.folder)
 		
 logParser.displaySummary()
 logParser.analyzeFiles()

@@ -3,17 +3,24 @@ import gzip
 import collections
 import argparse
 from datetime import datetime
+from urlparse import urlparse
+import GeoIP
+from lxml import etree
+from lxml.cssselect import CSSSelector
 
 class logParser():
 	chat = 0
-	d = collections.Counter()
-	u = collections.Counter()
-	t = collections.Counter()
-	p = collections.Counter()
-	e = collections.Counter()
+	d = collections.Counter() #Keyword counter
+	u = collections.Counter() #User counter
+	t = collections.Counter() #Traffic counter
+	p = collections.Counter() #Path counter
+	e = collections.Counter() #Error counter
+	r = collections.Counter() #Referrer counter
+	c = collections.Counter() #Country counter
 	files = []
 	first = datetime.now()
 	last = datetime.strptime("1000","%Y")
+	
 	
 	def humanize(self, bytes):
 		if bytes < 1024:
@@ -26,6 +33,7 @@ class logParser():
 			return "%.1f GB" % (bytes / 1024.0 ** 3)
 			
 	def parseLogs(self, file):
+		#If the file is packed, then open it. Otherwise just open the file.
 		if file.endswith(".gz"):
 			fh = gzip.open(file)
 		else:
@@ -34,30 +42,42 @@ class logParser():
 		 
 		for line in fh:
 			try:
-				#157.55.39.242 - - [20/Mar/2016:06:42:47 +0200] "GET /~jpoial/docs/api/index.html?java/awt/event/ContainerAdapter.html HTTP/1.1" 200 1417 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)"
+				#Example line: 157.55.39.242 - - [20/Mar/2016:06:42:47 +0200] "GET /~jpoial/docs/api/index.html?java/awt/event/ContainerAdapter.html HTTP/1.1" 200 1417 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)"
+				#Split line to extract data
 				source, request, response, referrer, _, agent, _ = line.split("\"")
 				method, path, protocol = request.split(" ")
 				_, user, file = path.split("/",3)
 				_, code, traffic = response.split(" ",2)
-				time, rfc, uid, timez, zone = source.split(" ",4)
+				ips, rfc, uid, timez, zone = source.split(" ",4)
 				
+				#Format date to make timeline
 				stamped = datetime.strptime(timez,"[%d/%b/%Y:%H:%M:%S")
 				if(self.first > stamped):
 					self.first = stamped
 				if(self.last < stamped):
 					self.last = stamped
 					
-				#print "referrer: ", referrer
-					
-				self.p[path] += 1
+				#Check for referers
+				_, netloc, refpath, _, _, _ = urlparse(referrer)
+				if netloc == "":
+					netloc = "direct"
+				self.r[netloc] += 1
 				
+				#mark visited countrys
+				if ips:
+					self.c[self.gi.country_code_by_addr(ips).lower()] += 1
+				
+				#mark what was requested
+				self.p[path] += 1
 				if (code[:1] == "5") or (code[:1]) == "4":
 					self.e[path] += 1
 					
+				#mark requested users
 				if user[:1] == "~":
 					self.u[user] += 1
 					self.t[user] += int(traffic)
 				
+				#mark keyword counter
 				for keyword in keywords:
 					if keyword in agent:
 						self.d[keyword] += 1
@@ -109,6 +129,10 @@ class logParser():
 		for path, hits in self.e.most_common(5):
 			print "%s => %d (%.02f%%)" % (path, hits, hits * 100 / sum(self.e.values()))
 			
+		print "\nTop 5 referers (total: %d):" % (sum(self.r.values()))
+		for host, hits in self.r.most_common(5):
+			print "%s => %d (%.02f%%)" % (host, hits, hits * 100 / sum(self.r.values()))
+			
 		print "=============================================\n\n"
 		
 		
@@ -127,15 +151,39 @@ class logParser():
 		print "Newest entry is:", self.last
 		print "Oldest entry is:", self.first
 		
+	def paintWorld(self): 
+		startColor = 240 #blue
+		endColor = 360 #red
+		startLight = 100 #light like white
+		endLight = 25 #dark but not black
+		world =  etree.parse(open('world.svg'))
+		sel = CSSSelector("#ee")
+		
+		for j in sel(document):
+			j.set("style", "fill:hsl(120, 100%, 50%);")
+			# Remove styling from children
+			for i in j.iterfind("{http://www.w3.org/2000/svg}path"):
+				i.attrib.pop("class", "")
+		 
+		with open("marked.svg", "w") as fh:
+			fh.write(etree.tostring(document))
+	
+#Command build
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--folder',  help="Path to log files", default="logs/")
 parser.add_argument('-v', '--verbose', help="Increase verbosity", action="store_true")
 args = parser.parse_args()
 
+#create logParser
 logParser = logParser()
+#Set up geoip and verbose
+logParser.gi = GeoIP.open("GeoIP.dat", GeoIP.GEOIP_MEMORY_CACHE)
 if args.verbose: logParser.chat = 1;
+#Scan for log files
 logParser.parseDirectory(args.folder)
 		
+#Display whats found and analyze stuffs
 logParser.displaySummary()
 logParser.analyzeFiles()
+logParser.paintWorld()
 

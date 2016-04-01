@@ -4,7 +4,8 @@ import collections
 import argparse
 from datetime import datetime
 from urlparse import urlparse
-import GeoIP
+import pygeoip
+from pygeoip import GeoIP
 from lxml import etree
 from lxml.cssselect import CSSSelector
 
@@ -151,23 +152,28 @@ class logParser():
 		print "Newest entry is:", self.last
 		print "Oldest entry is:", self.first
 		
-	def paintWorld(self): 
-		startColor = 240 #blue
-		endColor = 360 #red
-		startLight = 100 #light like white
-		endLight = 25 #dark but not black
-		world =  etree.parse(open('world.svg'))
-		sel = CSSSelector("#ee")
 		
+	def paintWorld(self): 
+		document =  etree.parse(open('world.svg'))
+		
+		startColor = 240 	#Blue
+		endColor = 360 		#Red
+		startLight = 75 	#Light
+		endLight = 25 		#Dark
+		# hsl(color, 100%, light);
+		
+		sel = CSSSelector("#ee")
 		for j in sel(document):
-			j.set("style", "fill:hsl(120, 100%, 50%);")
+			j.set("style", "fill:red")
 			# Remove styling from children
 			for i in j.iterfind("{http://www.w3.org/2000/svg}path"):
 				i.attrib.pop("class", "")
 		 
-		with open("marked.svg", "w") as fh:
+		with open("highlighted.svg", "w") as fh:
 			fh.write(etree.tostring(document))
-	
+			
+			
+			
 #Command build
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--folder',  help="Path to log files", default="logs/")
@@ -177,7 +183,7 @@ args = parser.parse_args()
 #create logParser
 logParser = logParser()
 #Set up geoip and verbose
-logParser.gi = GeoIP.open("GeoIP.dat", GeoIP.GEOIP_MEMORY_CACHE)
+logParser.gi = GeoIP("GeoIP.dat", pygeoip.MEMORY_CACHE)
 if args.verbose: logParser.chat = 1;
 #Scan for log files
 logParser.parseDirectory(args.folder)

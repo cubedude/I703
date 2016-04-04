@@ -16,7 +16,7 @@ Before labs:
  1) Tried to install Apache server to run web.. turns out its pretty good for html but not for Python... atleast what i found out.
  2) Researched a bit about micro-frameworks and had a pretty good theory on what to do.
  3) Found Flask. Tried to get that to work but it just seemed error upon error upon error.. some virutalisation and things.
- 4) Got Flask working
+ 4) Got Flask working!
  5) Just noticed the previous code is using Falcon which seems faster and easyer.. switching to that.
  7) Python is so different from PHP for web. Get kinda stuck with every step. Even sessions need like custom librarys.
  8) Haven't attached any databases or LARP yet.. still trying to get a good foundation to build on.

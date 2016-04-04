@@ -45,6 +45,7 @@ Lab 3:
  - EDIT 3: skype looks like its from the 90s and i even had to download script to turn on numlock
  - EDIT 4: all the fonts are weird aswell and i kinda need them to look perfect.. Also no programs like Photoshop or Outlook (i know there are alternatives but my job requires them)
  - EDIT 5: NOPE NOPE NOPE, did a clean install on Windows 10 back, i saw how much configuring its required to get Linux to work and i want to see the sun this summer 
+ - *note that this all was in the course of 1-2 weeks, not a day or so*
 	
 Lab 4:
  - Saw that Lab 4 has lab 3 excerisises.. moving on to that

@@ -19,8 +19,11 @@ Before labs:
  4) Got Flask working!
  5) Just noticed the previous code is using Falcon which seems faster and easyer.. switching to that.
  7) Python is so different from PHP for web. Get kinda stuck with every step. Even sessions need like custom librarys.
- 8) Why do i tourment myself..
+ 8) Haven't attached any databases or LARP yet.. still trying to get a good foundation to build on.
+ 9) Why do i tourment myself..
+ 
  - Okey.. i know when i am way over my head in something. That was alot of time wasted.
+ 
  - Gonna do labs to catch up with people and actually learn Python the right way.
 
 Lab 1:

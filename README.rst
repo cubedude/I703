@@ -13,13 +13,13 @@ Progression diary:
 Before labs:
  - First idea was to do user managment system using LARP
  - Turned out to be really hard if you are not new to web but are still new to Python and linux things..
-		1. Tried to install Apache server to run web.. turns out its pretty good for html but not for Python... atleast what i found out.
-		2. Researched a bit about micro-frameworks and had a pretty good theory on what to do.
-		3. Found Flask. Tried to get that to work but it just seemed error upon error upon error.. some virutalisation and things.
-		4. Got Flask working! 
-		5. Just noticed the previous code is using Falcon which seems faster and easyer.. switching to that.
-		7. Python is so different from PHP for web. Get kinda stuck with every step. Even sessions need like custom librarys.
-		8. Why do i tourment myself..
+	1. Tried to install Apache server to run web.. turns out its pretty good for html but not for Python... atleast what i found out.
+	2. Researched a bit about micro-frameworks and had a pretty good theory on what to do.
+	3. Found Flask. Tried to get that to work but it just seemed error upon error upon error.. some virutalisation and things.
+	4. Got Flask working! 
+	5. Just noticed the previous code is using Falcon which seems faster and easyer.. switching to that.
+	7. Python is so different from PHP for web. Get kinda stuck with every step. Even sessions need like custom librarys.
+	8. Why do i tourment myself..
 		
  - Okey.. i know when i am way over my head in something. That was alot of time wasted.
  - Gonna do labs to catch up with people and actually learn Python the right way.
@@ -62,7 +62,7 @@ Lab 5:
  - Not that i got it working right off the bat but still
  - Opening in browser didnt work like that. 
  - Using another library called  "webbrowser"
- - .. still in progress
+ - still in progress..
 	
 	
 Conclusion:

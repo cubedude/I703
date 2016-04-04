@@ -13,14 +13,13 @@ Progression diary:
 Before labs:
  - First idea was to do user managment system using LARP
  - Turned out to be really hard if you are not new to web but are still new to Python and linux things..
-	1. Tried to install Apache server to run web.. turns out its pretty good for html but not for Python... atleast what i found out.
-	2. Researched a bit about micro-frameworks and had a pretty good theory on what to do.
-	3. Found Flask. Tried to get that to work but it just seemed error upon error upon error.. some virutalisation and things.
-	4. Got Flask working! 
-	5. Just noticed the previous code is using Falcon which seems faster and easyer.. switching to that.
-	7. Python is so different from PHP for web. Get kinda stuck with every step. Even sessions need like custom librarys.
-	8. Why do i tourment myself..
-		
+  1. Tried to install Apache server to run web.. turns out its pretty good for html but not for Python... atleast what i found out.
+  2. Researched a bit about micro-frameworks and had a pretty good theory on what to do.
+  3. Found Flask. Tried to get that to work but it just seemed error upon error upon error.. some virutalisation and things.
+  4. Got Flask working!
+  5. Just noticed the previous code is using Falcon which seems faster and easyer.. switching to that.
+  7. Python is so different from PHP for web. Get kinda stuck with every step. Even sessions need like custom librarys.
+  8. Why do i tourment myself..
  - Okey.. i know when i am way over my head in something. That was alot of time wasted.
  - Gonna do labs to catch up with people and actually learn Python the right way.
 
@@ -51,18 +50,17 @@ Lab 4:
  - Saw that Lab 4 has lab 3 excerisises.. moving on to that
  - Installed PiP on windows, actually got it to work this time
  - Switching from geoip to pygeoip since the first one doesn't seem to work in windows since it needs some linux librarys.
+ - Ipv6 addresses are kinda breaking the code... adding functions to filter them out and added another geoip database for them
  - Added world painting function to the class
- - Ipv6 addresses are kinda breaking the code... adding functions to filter them out and another geoip database for them
  - World painting seems fine
-	- blue and lighter colors are minimum
-	- red and darker colors are maximum
+  - blue and lighter colors are minimum
+  - red and darker colors are maximum
 	
 Lab 5:
  - Template generating is pretty small script.
  - Not that i got it working right off the bat but still
  - Opening in browser didnt work like that. 
- - Using another library called  "webbrowser"
- - still in progress..
+ - Using os system start to open report.
 	
 	
 Conclusion:

@@ -18,6 +18,8 @@ from jinja2 import Environment, FileSystemLoader
 import codecs
 import webbrowser
 
+
+
 class logParser():
 	chat = 0
 	d = collections.Counter() #Keyword counter
@@ -231,13 +233,14 @@ class logParser():
 
 	def generateReport(self): 
 		env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)),trim_blocks=True)
-			
+		user_bytes = sorted(self.u.items(), key = lambda item:item[1], reverse=True)
+		
 		with codecs.open(str(self.build)+"output.html", "w", encoding="utf-8") as fh:    
 			fh.write(env.get_template(str(self.template)+"report.html").render(locals()))
 			
 		url = "file://" + os.path.realpath(str(self.build)+"output.html") + " &"
-		new = 2 #open in new tab
-		webbrowser.open(url,new=new)
+		#webbrowser.open(url,new=2)
+		os.system("start \"\" "+str(url))
 		
 			
 #Command build

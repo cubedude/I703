@@ -156,18 +156,31 @@ class logParser():
 	def paintWorld(self): 
 		document =  etree.parse(open('world.svg'))
 		
+		print "\n============================================="
+		print "Painting World"
 		startColor = 240 	#Blue
 		endColor = 360 		#Red
 		startLight = 75 	#Light
 		endLight = 25 		#Dark
+		colRange = endColor - startColor
+		lightRange = endLight - startLight
 		# hsl(color, 100%, light);
 		
-		sel = CSSSelector("#ee")
-		for j in sel(document):
-			j.set("style", "fill:red")
-			# Remove styling from children
-			for i in j.iterfind("{http://www.w3.org/2000/svg}path"):
-				i.attrib.pop("class", "")
+		maxHits = max(self.c.values());
+		print "max hits: ", maxHits;
+		for country, hits in self.c.most_common():
+			sel = CSSSelector("#" + country)
+			
+			pros = (hits*100)/maxHits
+			color = (colRange*pros)+startColor
+			light = (lightRange*pros)+startLight
+			
+			for j in sel(document):
+				j.set("style", "fill: hsl(" + str(color) + ", 100%, " + str(light) + "%)")
+				
+				# Remove styling from children
+				for i in j.iterfind("{http://www.w3.org/2000/svg}path"):
+					i.attrib.pop("class", "")
 		 
 		with open("highlighted.svg", "w") as fh:
 			fh.write(etree.tostring(document))
@@ -184,6 +197,7 @@ args = parser.parse_args()
 logParser = logParser()
 #Set up geoip and verbose
 logParser.gi = GeoIP("GeoIP.dat", pygeoip.MEMORY_CACHE)
+logParser.gi = GeoIP("GeoIPv6.dat", pygeoip.MEMORY_CACHE)
 if args.verbose: logParser.chat = 1;
 #Scan for log files
 logParser.parseDirectory(args.folder)

@@ -1,13 +1,22 @@
 import os
 import gzip
 import collections
+
 import argparse
+import socket
+
 from datetime import datetime
 from urlparse import urlparse
+
 import pygeoip
 from pygeoip import GeoIP
+
 from lxml import etree
 from lxml.cssselect import CSSSelector
+
+from jinja2 import Environment, FileSystemLoader
+import codecs
+import webbrowser
 
 class logParser():
 	chat = 0
@@ -22,6 +31,27 @@ class logParser():
 	first = datetime.now()
 	last = datetime.strptime("1000","%Y")
 	
+
+	def is_valid_ipv4_address(self, address):
+		try:
+			socket.inet_pton(socket.AF_INET, address)
+		except AttributeError:  # no inet_pton here, sorry
+			try:
+				socket.inet_aton(address)
+			except (socket.error, AttributeError):
+				return False
+			return address.count('.') == 3
+		except (socket.error, AttributeError):  # not a valid address
+			return False
+
+		return True
+
+	def is_valid_ipv6_address(self, address):
+		try:
+			socket.inet_pton(socket.AF_INET6, address)
+		except (socket.error, AttributeError):  # not a valid address
+			return False
+		return True
 	
 	def humanize(self, bytes):
 		if bytes < 1024:
@@ -66,7 +96,10 @@ class logParser():
 				
 				#mark visited countrys
 				if ips:
-					self.c[self.gi.country_code_by_addr(ips).lower()] += 1
+					if self.is_valid_ipv4_address(ips):
+						self.c[self.gi.country_code_by_addr(ips).lower()] += 1
+					if self.is_valid_ipv6_address(ips):
+						self.c[self.gi6.country_code_by_addr(ips).lower()] += 1
 				
 				#mark what was requested
 				self.p[path] += 1
@@ -134,6 +167,18 @@ class logParser():
 		for host, hits in self.r.most_common(5):
 			print "%s => %d (%.02f%%)" % (host, hits, hits * 100 / sum(self.r.values()))
 			
+		maxHits = max(self.c.values())
+		startColor = 240 	#Blue
+		endColor = 360 		#Red
+		colRange = endColor - startColor
+		
+		print "\nTop 10 countrys (Max: %d):" % maxHits
+		
+		for country, hits in self.c.most_common(10):
+			pros = hits * 100 / maxHits
+			color = ((colRange/100)*pros)+startColor
+			print "%s => %d (%.02f%%)" % (country, hits, pros)
+			
 		print "=============================================\n\n"
 		
 		
@@ -154,51 +199,67 @@ class logParser():
 		
 		
 	def paintWorld(self): 
-		document =  etree.parse(open('world.svg'))
+		document =  etree.parse(open(str(self.template)+'world.svg'))
 		
 		print "\n============================================="
 		print "Painting World"
+		
 		startColor = 240 	#Blue
 		endColor = 360 		#Red
-		startLight = 75 	#Light
+		startLight = 95 	#Light
 		endLight = 25 		#Dark
 		colRange = endColor - startColor
-		lightRange = endLight - startLight
-		# hsl(color, 100%, light);
-		
+		lightRange = startLight - endLight
 		maxHits = max(self.c.values());
-		print "max hits: ", maxHits;
+		
 		for country, hits in self.c.most_common():
-			sel = CSSSelector("#" + country)
-			
-			pros = (hits*100)/maxHits
-			color = (colRange*pros)+startColor
-			light = (lightRange*pros)+startLight
-			
-			for j in sel(document):
-				j.set("style", "fill: hsl(" + str(color) + ", 100%, " + str(light) + "%)")
+			if country:
+				sel = CSSSelector("#" + str(country))
 				
-				# Remove styling from children
-				for i in j.iterfind("{http://www.w3.org/2000/svg}path"):
-					i.attrib.pop("class", "")
+				pros = hits * 100 / maxHits
+				color = ((colRange/100)*pros)+startColor
+				lightness = startLight-((lightRange*pros)/100)
+				for j in sel(document):
+					j.set("style", "fill: hsl(" + str(color) + ", 100%, " + str(lightness) + "%)")
+					
+					# Remove styling from children
+					for i in j.iterfind("{http://www.w3.org/2000/svg}path"):
+						i.attrib.pop("class", "")
 		 
-		with open("highlighted.svg", "w") as fh:
+		with open(str(self.build)+"highlighted.svg", "w") as fh:
 			fh.write(etree.tostring(document))
+
+	def generateReport(self): 
+		env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)),trim_blocks=True)
 			
+		with codecs.open(str(self.build)+"output.html", "w", encoding="utf-8") as fh:    
+			fh.write(env.get_template(str(self.template)+"report.html").render(locals()))
 			
+		url = "file://" + os.path.realpath(str(self.build)+"output.html") + " &"
+		new = 2 #open in new tab
+		webbrowser.open(url,new=new)
+		
 			
 #Command build
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--folder',  help="Path to log files", default="logs/")
+parser.add_argument('-t', '--template',  help="Path to template folder", default="templates/")
+parser.add_argument('-b', '--build',  help="Path to build folder", default="build/")
 parser.add_argument('-v', '--verbose', help="Increase verbosity", action="store_true")
 args = parser.parse_args()
 
 #create logParser
 logParser = logParser()
-#Set up geoip and verbose
+
+#Set up geoip 
 logParser.gi = GeoIP("GeoIP.dat", pygeoip.MEMORY_CACHE)
-logParser.gi = GeoIP("GeoIPv6.dat", pygeoip.MEMORY_CACHE)
+logParser.gi6 = GeoIP("GeoIPv6.dat", pygeoip.MEMORY_CACHE)
+
+#Set some settings
+logParser.template = args.template
+logParser.build = args.build
 if args.verbose: logParser.chat = 1;
+
 #Scan for log files
 logParser.parseDirectory(args.folder)
 		
@@ -206,4 +267,5 @@ logParser.parseDirectory(args.folder)
 logParser.displaySummary()
 logParser.analyzeFiles()
 logParser.paintWorld()
+logParser.generateReport()
 

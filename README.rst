@@ -21,7 +21,7 @@ Before labs:
  7) Python is so different from PHP for web. Get kinda stuck with every step. Even sessions need like custom librarys.
  8) Haven't attached any databases or LARP yet.. still trying to get a good foundation to build on.
  9) Why do i tourment myself..
- 
+
  - Okey.. i know when i am way over my head in something. That was alot of time wasted.
  
  - Gonna do labs to catch up with people and actually learn Python the right way.
@@ -82,7 +82,7 @@ Lab 7:
  - Added .png to the "allowed images" list
  - Added a crop functionality that when enabled, will force the set width and height. Great for making thumbnails!
 
-	
+
 Conclusion:
 -----------------
 .. figure:: http://www.metsvahi.ee/hv/img/progress_so_far.jpg

@@ -233,16 +233,8 @@ class logParser():
 		with open(str(self.build)+"highlighted.svg", "w") as fh:
 			fh.write(etree.tostring(document))
 
-	def generateReport(self): 
-		env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)),trim_blocks=True)
-		user_bytes = sorted(self.u.items(), key = lambda item:item[1], reverse=True)
-		
-		with codecs.open(str(self.build)+"output.html", "w", encoding="utf-8") as fh:    
-			fh.write(env.get_template(str(self.template)+"report.html").render(locals()))
-			
-		url = "file://" + os.path.realpath(str(self.build)+"output.html") + " &"
-		#webbrowser.open(url,new=2)
-		os.system("start \"\" "+str(url))
+		#url = "file://" + os.path.realpath(str(self.build)+"output.html") + " &"
+		#os.system("start \"\" "+str(url))
 		
 
 		
@@ -274,14 +266,24 @@ logParser.parseDirectory(args.folder)
 logParser.displaySummary()
 logParser.analyzeFiles()
 logParser.paintWorld()
-#logParser.generateReport()
 
 #Create Flask
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-	return "Go fun yorself!"
+	return "Welcome to the not-so-good Apache 2 log parser!"
+
+@app.route("/report/")
+def report():
+	env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)),trim_blocks=True)
+	user_bytes = sorted(logParser.items(), key = lambda item:item[1], reverse=True)
+
+	with codecs.open(str(args.build)+"output.html", "w", encoding="utf-8") as fh:
+		fh.write(env.get_template(str(args.template)+"report.html").render(locals()))
+
+	return env.get_template(str(self.build)+"output.html")
+
 
 if __name__ == '__main__':
 	app.run(debug=True)

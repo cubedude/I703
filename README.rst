@@ -82,7 +82,11 @@ Lab 7:
  - Added .png to the "allowed images" list
  - Added a crop functionality that when enabled, will force the set width and height. Great for making thumbnails!
 
-
+Lab 8:
+ - Due to technical troubles, no sound is on the lecture recording and the wiki doesn't really explain anything..
+ - Gonna get more info about it...
+ 
+ 
 Conclusion:
 -----------------
 .. figure:: http://www.metsvahi.ee/hv/img/progress_so_far.jpg

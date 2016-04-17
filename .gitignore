@@ -1,5 +1,6 @@
-skip/
-logs/
 commands.txt
-GeoIP.dat
-GeoIPv6.dat
+Imagizer/input/
+LogParser/skip/
+LogParser/logs/
+LogParser/GeoIP.dat
+LogParser/GeoIPv6.dat

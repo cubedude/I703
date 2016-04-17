@@ -7,6 +7,7 @@ import socket
 
 from datetime import datetime
 from urlparse import urlparse
+from threading import Thread
 
 import pygeoip
 from pygeoip import GeoIP
@@ -18,6 +19,7 @@ from jinja2 import Environment, FileSystemLoader
 import codecs
 import webbrowser
 
+from flask import Flask, request
 
 
 class logParser():
@@ -242,7 +244,8 @@ class logParser():
 		#webbrowser.open(url,new=2)
 		os.system("start \"\" "+str(url))
 		
-			
+
+		
 #Command build
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--folder',  help="Path to log files", default="logs/")
@@ -263,6 +266,7 @@ logParser.template = args.template
 logParser.build = args.build
 if args.verbose: logParser.chat = 1;
 
+
 #Scan for log files
 logParser.parseDirectory(args.folder)
 		
@@ -270,5 +274,15 @@ logParser.parseDirectory(args.folder)
 logParser.displaySummary()
 logParser.analyzeFiles()
 logParser.paintWorld()
-logParser.generateReport()
+#logParser.generateReport()
 
+#Create Flask
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+	return "Go fun yorself!"
+
+if __name__ == '__main__':
+	app.run(debug=True)
+	

@@ -43,7 +43,7 @@ Lab 3:
 	
  - GeoIp under Windows turned out to be tricky... thinking about moving this project over to a linux OS... only i dont have one really since i use Windows...
 	
- - EDIT: Installed Linux Mint 17.3 on my main computer for Python and a few other classes in school... its .. intresting..
+ - EDIT: Installed Linux Mint 17.3 on my main computer for Python and a few other classes in school... its .. interesting..
  - EDIT 2: oh god what have i done... Managed to screw up the video drivers so much that i had to do a clean install again..
  - EDIT 3: skype looks like its from the 90s and i even had to download script to turn on numlock
  - EDIT 4: all the fonts are weird aswell and i kinda need them to look perfect.. Also no programs like Photoshop or Outlook (i know there are alternatives but my job requires them)
@@ -65,7 +65,23 @@ Lab 5:
  - Not that i got it working right off the bat but still
  - Opening in browser didnt work like that. 
  - Using os system start to open report.
-	
+
+Lab 6:
+ - Oh Falcon my new nemesis..
+ - Not entirely sure how to approach this..
+ - Have tried 3 different methods but all have failed.. Will move onto Lab 7 until i can figure it out
+
+Lab 7:
+ - Image manipulation! Created new project for it, downloaded some wallpapers for testing
+ - Since PIL is outdated i use Pillow, same thing kinda
+ - Added alot of commands-line arguments to the program like
+  - Input and output directory
+  - Maximum width and height for the new images
+  - Thread count
+  - Verbose mode
+ - Added .png to the "allowed images" list
+ - Added a crop functionality that when enabled, will force the set width and height. Great for making thumbnails!
+
 	
 Conclusion:
 -----------------

@@ -17,7 +17,7 @@ pip install Pillow
 
 Usage
 -----
-the directory and run the program:
+Run the program:
 ```
 python imagizer.py
 ```
